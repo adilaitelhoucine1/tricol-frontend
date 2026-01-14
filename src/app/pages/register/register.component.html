@@ -1,0 +1,188 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+  <div class="max-w-md w-full">
+    <!-- Back to Home -->
+    <div class="mb-6">
+      <a routerLink="/" class="text-indigo-600 hover:text-indigo-800 flex items-center font-medium">
+        <span class="mr-2">←</span> Retour à l'accueil
+      </a>
+    </div>
+
+    <!-- Register Card -->
+    <div class="bg-white rounded-2xl shadow-xl p-8">
+      <!-- Logo and Title -->
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">TRICOL</h1>
+        <h2 class="text-xl text-gray-600">Créer un compte</h2>
+        <p class="text-sm text-gray-500 mt-2">Rejoignez notre plateforme de gestion</p>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="error()" class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-md">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <span class="text-red-500">⚠️</span>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-red-700">{{ error() }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Register Form -->
+      <form (ngSubmit)="onSubmit()" class="space-y-5">
+        <!-- Username Field -->
+        <div>
+          <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+            Nom d'utilisateur *
+          </label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            [(ngModel)]="registerData.username"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            placeholder="Choisissez un nom d'utilisateur"
+            [disabled]="loading()"
+          />
+        </div>
+
+        <!-- Email Field -->
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+            Email *
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            [(ngModel)]="registerData.email"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            placeholder="votre.email@tricol.com"
+            [disabled]="loading()"
+          />
+        </div>
+
+        <!-- Role Selection -->
+        <div>
+          <label for="role" class="block text-sm font-medium text-gray-700 mb-2">
+            Rôle *
+          </label>
+          <select
+            id="role"
+            name="role"
+            [(ngModel)]="registerData.role"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            [disabled]="loading()"
+          >
+            <option *ngFor="let role of roles" [value]="role.value">
+              {{ role.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Password Field -->
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+            Mot de passe *
+          </label>
+          <div class="relative">
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              id="password"
+              name="password"
+              [(ngModel)]="registerData.password"
+              required
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition pr-12"
+              placeholder="Au moins 6 caractères"
+              [disabled]="loading()"
+            />
+            <button
+              type="button"
+              (click)="togglePassword()"
+              class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            >
+              {{ showPassword() ? '👁️' : '👁️‍🗨️' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Confirm Password Field -->
+        <div>
+          <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
+            Confirmer le mot de passe *
+          </label>
+          <div class="relative">
+            <input
+              [type]="showConfirmPassword() ? 'text' : 'password'"
+              id="confirmPassword"
+              name="confirmPassword"
+              [(ngModel)]="registerData.confirmPassword"
+              required
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition pr-12"
+              placeholder="Confirmez votre mot de passe"
+              [disabled]="loading()"
+            />
+            <button
+              type="button"
+              (click)="toggleConfirmPassword()"
+              class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            >
+              {{ showConfirmPassword() ? '👁️' : '👁️‍🗨️' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Terms and Conditions -->
+        <div class="flex items-start">
+          <input
+            type="checkbox"
+            id="terms"
+            required
+            class="h-4 w-4 mt-1 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+          />
+          <label for="terms" class="ml-2 block text-sm text-gray-700">
+            J'accepte les <a href="#" class="text-indigo-600 hover:text-indigo-800">conditions d'utilisation</a> et la <a href="#" class="text-indigo-600 hover:text-indigo-800">politique de confidentialité</a>
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          [disabled]="loading()"
+          class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+        >
+          <span *ngIf="!loading()">Créer mon compte</span>
+          <span *ngIf="loading()" class="flex items-center">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Inscription en cours...
+          </span>
+        </button>
+      </form>
+
+      <!-- Login Link -->
+      <div class="mt-6 text-center">
+        <p class="text-sm text-gray-600">
+          Vous avez déjà un compte ?
+          <a routerLink="/login" class="text-indigo-600 hover:text-indigo-800 font-medium">
+            Se connecter
+          </a>
+        </p>
+      </div>
+
+      <!-- Backend API Info -->
+      <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+        <p class="text-xs text-gray-600 mb-2 font-semibold">🔌 Backend API:</p>
+        <p class="text-xs text-gray-600">
+          <strong>Endpoint:</strong> POST http://localhost:8080/api/auth/register
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+

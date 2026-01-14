@@ -1,0 +1,93 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+  <!-- Navigation -->
+  <nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center">
+          <span class="text-2xl font-bold text-indigo-600">TRICOL</span>
+          <span class="ml-2 text-sm text-gray-600">Solutions Professionnelles</span>
+        </div>
+        <div class="flex space-x-4">
+          <a routerLink="/login" class="px-4 py-2 text-indigo-600 hover:text-indigo-800 font-medium transition">
+            Connexion
+          </a>
+          <a routerLink="/register" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-md">
+            S'inscrire
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+    <div class="text-center">
+      <h1 class="text-5xl font-extrabold text-gray-900 sm:text-6xl md:text-7xl">
+        <span class="block">Gestion Intelligente</span>
+        <span class="block text-indigo-600">pour Vêtements Professionnels</span>
+      </h1>
+      <p class="mt-6 max-w-2xl mx-auto text-xl text-gray-600">
+        Optimisez la gestion de vos stocks, approvisionnements et production avec notre plateforme digitale complète.
+      </p>
+      <div class="mt-10 flex justify-center space-x-4">
+        <a routerLink="/register" class="px-8 py-4 bg-indigo-600 text-white text-lg font-medium rounded-lg hover:bg-indigo-700 transition shadow-lg transform hover:scale-105">
+          Commencer Maintenant
+        </a>
+        <a routerLink="/login" class="px-8 py-4 bg-white text-indigo-600 text-lg font-medium rounded-lg hover:bg-gray-50 transition shadow-lg border-2 border-indigo-600">
+          Se Connecter
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Section -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold text-gray-900">Fonctionnalités Principales</h2>
+      <p class="mt-4 text-lg text-gray-600">Une solution complète pour votre entreprise</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div *ngFor="let feature of features" class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+        <div class="text-4xl mb-4">{{ feature.icon }}</div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ feature.title }}</h3>
+        <p class="text-gray-600">{{ feature.description }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Roles Section -->
+  <div class="bg-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900">Profils Utilisateurs</h2>
+        <p class="mt-4 text-lg text-gray-600">Des permissions adaptées à chaque rôle</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div *ngFor="let role of roles" class="p-6 border-2 border-indigo-200 rounded-xl hover:border-indigo-400 transition">
+          <h3 class="text-lg font-semibold text-indigo-600 mb-2">{{ role.name }}</h3>
+          <p class="text-gray-600">{{ role.description }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Section -->
+  <div class="bg-indigo-600 py-16">
+    <div class="max-w-4xl mx-auto text-center px-4">
+      <h2 class="text-3xl font-bold text-white mb-4">Prêt à digitaliser votre gestion ?</h2>
+      <p class="text-xl text-indigo-100 mb-8">Rejoignez TRICOL et optimisez vos processus dès aujourd'hui</p>
+      <a routerLink="/register" class="inline-block px-8 py-4 bg-white text-indigo-600 text-lg font-medium rounded-lg hover:bg-gray-100 transition shadow-lg transform hover:scale-105">
+        Créer un Compte Gratuitement
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white py-8">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <p class="text-gray-400">&copy; 2026 TRICOL. Tous droits réservés.</p>
+      <p class="text-gray-500 mt-2">Solutions professionnelles pour vêtements de travail</p>
+    </div>
+  </footer>
+</div>
+
