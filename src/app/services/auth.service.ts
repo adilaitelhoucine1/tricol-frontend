@@ -3,8 +3,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { User, LoginRequest, RegisterRequest, AuthResponse, UserRole } from '../../models/user.model';
-import { environment } from '../../../environments/environment';
+import { User, LoginRequest, RegisterRequest, AuthResponse, UserRole } from '../models/user.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +31,9 @@ export class AuthService {
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
     // Client-side validation
+
+    console.log('ddddd' , this.apiUrl);
+
     if (!credentials.username || !credentials.password) {
       return throwError(() => new Error('Username and password are required'));
     }
