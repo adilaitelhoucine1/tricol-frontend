@@ -1,5 +1,6 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { User, LoginRequest, RegisterRequest, AuthResponse, UserRole } from '../../models/user.model';
@@ -8,6 +9,7 @@ import { environment } from '../../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
+
 export class AuthService {
   private http = inject(HttpClient);
   private apiUrl = environment.apiUrl;
@@ -36,7 +38,6 @@ export class AuthService {
     // Real API call to Spring Boot backend
     return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, credentials).pipe(
       tap(response => {
-        // Handle new backend response format with accessToken
         const token = response.accessToken || response.token;
         const refreshToken = response.refreshToken;
 

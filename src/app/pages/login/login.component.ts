@@ -35,7 +35,16 @@ export class LoginComponent {
       next: (response) => {
         this.loading.set(false);
         console.log('Login successful:', response.message);
-        this.router.navigate(['/dashboard']);
+
+
+        const userRole = response.user?.roles;
+        if (userRole?.includes("ADMIN")) {
+          console.log("Navigating to admin dashboard, role:", userRole);
+          this.router.navigate(['/admin-dashboard']);
+        } else {
+          console.log("Navigating to user dashboard, role:", userRole);
+          this.router.navigate(['/dashboard']);
+        }
       },
       error: (err) => {
         this.loading.set(false);
