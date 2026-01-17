@@ -2,7 +2,11 @@ export interface User {
   id: number;
   username: string;
   email: string;
-  role: UserRole;
+  firstName?: string;
+  lastName?: string;
+  role?: UserRole; // Keep for backward compatibility
+  roles?: string[]; // Array of roles from backend
+  permissions?: string[]; // Array of permissions from backend
   token?: string;
 }
 
@@ -23,12 +27,18 @@ export interface RegisterRequest {
   email: string;
   password: string;
   confirmPassword: string;
+  firstName: string;
+  lastName: string;
   role?: UserRole;
 }
 
 export interface AuthResponse {
   user: User;
-  token: string;
+  accessToken?: string; // New backend structure
+  refreshToken?: string; // New backend structure
+  tokenType?: string | null;
+  expiresIn?: number;
+  token?: string; // Keep for backward compatibility
   message?: string;
 }
 

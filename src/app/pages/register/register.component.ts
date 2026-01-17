@@ -18,6 +18,8 @@ export class RegisterComponent {
     email: '',
     password: '',
     confirmPassword: '',
+    firstName: '',
+    lastName: '',
     role: UserRole.WAREHOUSE_KEEPER
   };
 
@@ -43,8 +45,14 @@ export class RegisterComponent {
 
     // Client-side validation
     if (!this.registerData.username || !this.registerData.email ||
-        !this.registerData.password || !this.registerData.confirmPassword) {
+        !this.registerData.password || !this.registerData.confirmPassword ||
+        !this.registerData.firstName || !this.registerData.lastName) {
       this.error.set('Tous les champs sont requis');
+      return;
+    }
+
+    if (this.registerData.username.length < 3 || this.registerData.username.length > 50) {
+      this.error.set('Le nom d\'utilisateur doit contenir entre 3 et 50 caractères');
       return;
     }
 

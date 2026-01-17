@@ -14,9 +14,14 @@ export class AuthService {
 
   private currentUserSignal = signal<User | null>(null);
   private tokenSignal = signal<string | null>(null);
+  private refreshTokenSignal = signal<string | null>(null);
 
   currentUser = this.currentUserSignal.asReadonly();
   token = this.tokenSignal.asReadonly();
+
+  getRefreshToken(): string | null {
+    return this.refreshTokenSignal();
+  }
 
   constructor() {
     this.loadUserFromStorage();
@@ -31,8 +36,12 @@ export class AuthService {
     // Real API call to Spring Boot backend
     return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, credentials).pipe(
       tap(response => {
-        if (response.token && response.user) {
-          this.setAuthData(response.user, response.token);
+        // Handle new backend response format with accessToken
+        const token = response.accessToken || response.token;
+        const refreshToken = response.refreshToken;
+
+        if (token && response.user) {
+          this.setAuthData(response.user, token, refreshToken);
         }
       }),
       catchError(this.handleError)
@@ -41,7 +50,8 @@ export class AuthService {
 
   register(userData: RegisterRequest): Observable<AuthResponse> {
     // Client-side validation
-    if (!userData.username || !userData.email || !userData.password) {
+    if (!userData.username || !userData.email || !userData.password ||
+        !userData.firstName || !userData.lastName) {
       return throwError(() => new Error('All fields are required'));
     }
 
@@ -53,19 +63,27 @@ export class AuthService {
       return throwError(() => new Error('Password must be at least 6 characters'));
     }
 
-    // Prepare request body (remove confirmPassword as backend doesn't need it)
+    if (userData.username.length < 3 || userData.username.length > 50) {
+      return throwError(() => new Error('Username must be between 3 and 50 characters'));
+    }
+
+    // Prepare request body matching backend RegisterRequestDTO
     const registerData = {
       username: userData.username,
       email: userData.email,
       password: userData.password,
-      role: userData.role
+      firstName: userData.firstName,
+      lastName: userData.lastName
     };
 
-    // Real API call to Spring Boot backend
     return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, registerData).pipe(
       tap(response => {
-        if (response.token && response.user) {
-          this.setAuthData(response.user, response.token);
+        // Handle new backend response format with accessToken
+        const token = response.accessToken || response.token;
+        const refreshToken = response.refreshToken;
+
+        if (token && response.user) {
+          this.setAuthData(response.user, token, refreshToken);
         }
       }),
       catchError(this.handleError)
@@ -75,8 +93,10 @@ export class AuthService {
   logout(): void {
     this.currentUserSignal.set(null);
     this.tokenSignal.set(null);
+    this.refreshTokenSignal.set(null);
     localStorage.removeItem('tricol_user');
     localStorage.removeItem('tricol_token');
+    localStorage.removeItem('tricol_refresh_token');
   }
 
   isAuthenticated(): boolean {
@@ -88,9 +108,13 @@ export class AuthService {
     return user?.role === role;
   }
 
-  private setAuthData(user: User, token: string): void {
+  private setAuthData(user: User, token: string, refreshToken?: string): void {
     this.currentUserSignal.set(user);
     this.tokenSignal.set(token);
+    if (refreshToken) {
+      this.refreshTokenSignal.set(refreshToken);
+      localStorage.setItem('tricol_refresh_token', refreshToken);
+    }
     localStorage.setItem('tricol_user', JSON.stringify(user));
     localStorage.setItem('tricol_token', token);
   }
@@ -98,12 +122,16 @@ export class AuthService {
   private loadUserFromStorage(): void {
     const userStr = localStorage.getItem('tricol_user');
     const token = localStorage.getItem('tricol_token');
+    const refreshToken = localStorage.getItem('tricol_refresh_token');
 
     if (userStr && token) {
       try {
         const user = JSON.parse(userStr);
         this.currentUserSignal.set(user);
         this.tokenSignal.set(token);
+        if (refreshToken) {
+          this.refreshTokenSignal.set(refreshToken);
+        }
       } catch (error) {
         this.logout();
       }
