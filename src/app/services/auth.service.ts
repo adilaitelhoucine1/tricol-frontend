@@ -5,7 +5,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { User, LoginRequest, RegisterRequest, AuthResponse, UserRole } from '../models/user.model';
 import { environment } from '../../environments/environment';
-
+import { Router } from '@angular/router';
 @Injectable({
   providedIn: 'root'
 })
@@ -25,7 +25,7 @@ export class AuthService {
     return this.refreshTokenSignal();
   }
 
-  constructor() {
+  constructor(private router:Router) {
     this.loadUserFromStorage();
   }
 
@@ -101,6 +101,7 @@ export class AuthService {
     localStorage.removeItem('tricol_user');
     localStorage.removeItem('tricol_token');
     localStorage.removeItem('tricol_refresh_token');
+    this.router.navigate(['/login']);
   }
 
   isAuthenticated(): boolean {

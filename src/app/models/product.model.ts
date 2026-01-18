@@ -1,11 +1,13 @@
 export interface Product {
   id: number;
-  name: string;
+  nom: string;
   reference: string;
-  category: string;
-  alertThreshold: number;
-  currentStock: number;
-  unit: string;
-  price: number;
+  prixUnitaire: number;
+  stockActuel: number;
+  description :string;
+  categorie :string;
+  stockInitial :number;
+  pointDeCommande :number;
+  uniteMesure :string;
 }
 
