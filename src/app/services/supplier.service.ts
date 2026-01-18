@@ -12,11 +12,9 @@ export class SupplierService {
   private apiUrl = `${environment.apiUrl}/v1/fournisseurs`;
 
   constructor() {
-    console.log('🔗 SupplierService API URL:', this.apiUrl);
   }
 
   getAll(): Observable<SupplierModal[]> {
-    console.log('📡 Fetching suppliers from:', this.apiUrl);
     return this.http.get<SupplierModal[]>(this.apiUrl);
   }
 
