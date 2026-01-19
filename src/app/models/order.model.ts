@@ -1,3 +1,5 @@
+import {OrderItem} from './OrderItem.model';
+
 export interface Order {
   id: number;
   orderNumber: string;
@@ -9,10 +11,4 @@ export interface Order {
   items: OrderItem[];
 }
 
-export interface OrderItem {
-  productId: number;
-  productName: string;
-  quantity: number;
-  unitPrice: number;
-}
 
