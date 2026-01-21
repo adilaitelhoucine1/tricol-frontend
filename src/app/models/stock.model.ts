@@ -19,3 +19,24 @@ export interface StockMovement {
   reference: string;
 }
 
+export interface EtatGlobal {
+  produitId: number;
+  reference: string;
+  nom: string;
+  categorie: string;
+  quantiteDisponible: number;
+  valorisation: number;
+  pointDeCommande: number;
+  enAlerte: boolean;
+}
+
+export interface AlerteStock {
+  produitId: number;
+  reference: string;
+  nom: string;
+  categorie: string;
+  stockActuel: number;
+  pointDeCommande: number;
+  manquant: number;
+}
+

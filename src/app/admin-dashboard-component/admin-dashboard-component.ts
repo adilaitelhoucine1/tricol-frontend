@@ -10,6 +10,8 @@ import {AuthService} from '../services/auth.service';
 import {OrderService} from '../services/order.service';
 import {Order} from '../models/order.model';
 import {OrderItem} from '../models/OrderItem.model';
+import {EtatGlobal, AlerteStock} from '../models/stock.model';
+import {StockService} from '../services/stock.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -23,6 +25,7 @@ export class AdminDashboardComponent implements OnInit {
    private authService = inject(AuthService);
    private productService=inject(ProductService);
    private orderService = inject(OrderService);
+   private stockService = inject(StockService);
    private cdr = inject(ChangeDetectorRef);
    private fb = inject(FormBuilder);
 
@@ -31,10 +34,15 @@ export class AdminDashboardComponent implements OnInit {
    products: Product[]=[];
    orders:Order[]=[];
    orderItems:OrderItem[]=[];
+   etatGlobal: EtatGlobal[] = [];
+   stockByProduit: any = null;
+   alertes: AlerteStock[] = [];
+   valorisation: string = '';
 
    loadingSuppliers: boolean = false;
    loadingProducts: boolean = false;
    loadingOrders: boolean = false;
+   loadingStock: boolean = false;
 
    sidebarOpen: boolean = true;
   activeSection: string = 'suppliers';
@@ -137,6 +145,16 @@ export class AdminDashboardComponent implements OnInit {
       icon: '🗑️',
       onClick: (order) => this.deleteOrder(order.id)
     }
+  ];
+
+  stockColumns: TableColumn[] = [
+    { key: 'reference', label: 'Référence', type: 'text' },
+    { key: 'nom', label: 'Nom', type: 'text' },
+    { key: 'categorie', label: 'Catégorie', type: 'text' },
+    { key: 'quantiteDisponible', label: 'Quantité', type: 'number' },
+    { key: 'valorisation', label: 'Valorisation (DH)', type: 'number' },
+    { key: 'pointDeCommande', label: 'Point de Commande', type: 'number' },
+    { key: 'enAlerte', label: 'Alerte', type: 'text' }
   ];
 
    ngOnInit(): void {
@@ -455,7 +473,6 @@ export class AdminDashboardComponent implements OnInit {
       this.orderService.delete(id).subscribe({
         next:()=>{
           this.getAllOrders();
-          this.activeSection="order";
         },
         error(error){
           alert(error);
@@ -493,8 +510,10 @@ export class AdminDashboardComponent implements OnInit {
     this.orderService.create(orderData as any).subscribe({
       next: () => {
         this.closeModal();
-        this.getAllOrders();
         this.activeSection="orders";
+        this.getAllOrders();
+        this.cdr.detectChanges();
+
         // alert('Commande créée avec succès');
       },
       error: (error) => {
@@ -535,6 +554,8 @@ export class AdminDashboardComponent implements OnInit {
      if (confirm("Etes vous sur de valider cette Commade")){
        this.orderService.valider(id).subscribe({
          next:()=>{
+           this.getAllOrders();
+
            alert("commande valide avec sucees");
          },
          error(error){
@@ -549,8 +570,9 @@ export class AdminDashboardComponent implements OnInit {
     if (confirm("Etes vous sur d annuler  cette Commade")){
       this.orderService.cancel(id).subscribe({
         next:()=>{
-          alert("commande anulle avec sucees");
           this.getAllOrders();
+
+          alert("commande anulle avec sucees");
         },
         error(error){
           alert(error.error.Erreur);
@@ -561,6 +583,52 @@ export class AdminDashboardComponent implements OnInit {
 
   onOrderRowClick(order: any): void {
     console.log('Order clicked:', order);
+  }
+
+  getEtatGlobal(): void {
+    this.loadingStock = true;
+    this.stockService.getEtatGlobal().subscribe({
+      next: (data) => {
+        this.etatGlobal = data;
+        this.loadingStock = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.loadingStock = false;
+        console.error('Erreur lors du chargement de l\'état global:', err);
+      }
+    });
+  }
+
+  getStockByProduit(produitId: number): void {
+    if (!produitId) return;
+    this.stockService.getStockByProduit(produitId).subscribe({
+      next: (data) => {
+        this.stockByProduit = data;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Erreur lors du chargement du stock:', err)
+    });
+  }
+
+  getAlertes(): void {
+    this.stockService.getAlertes().subscribe({
+      next: (data) => {
+        this.alertes = data;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Erreur lors du chargement des alertes:', err)
+    });
+  }
+
+  getValorisation(): void {
+    this.stockService.getValorisation().subscribe({
+      next: (data) => {
+        this.valorisation = data;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Erreur lors du chargement de la valorisation:', err)
+    });
   }
 
 
