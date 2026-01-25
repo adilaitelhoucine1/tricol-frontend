@@ -2,19 +2,44 @@ export interface User {
   id: number;
   username: string;
   email: string;
-  firstName?: string;
-  lastName?: string;
-  role?: UserRole; // Keep for backward compatibility
-  roles?: string[]; // Array of roles from backend
-  permissions?: string[]; // Array of permissions from backend
-  token?: string;
+  enabled: boolean;
+  role?: Role;
+  roles?: string[];
+  permissions?: string[];
+  customPermissions?: CustomPermission[];
+  createdAt?: Date;
 }
 
-export enum UserRole {
-  ADMIN = 'ADMINISTRATEUR',
-  PURCHASING_MANAGER = 'RESPONSABLE_ACHATS',
-  WAREHOUSE_KEEPER = 'MAGASINIER',
-  WORKSHOP_MANAGER = 'CHEF_ATELIER'
+export interface CustomPermission {
+  permissionId: number;
+  permissionName: string;
+  permissionCategory: string;
+  granted: boolean;
+  assignedAt: string;
+  assignedBy: string;
+}
+
+export interface Role {
+  id: number;
+  name: string;
+  description?: string;
+  permissions?: Permission[];
+}
+
+export interface Permission {
+  id: number;
+  name: string;
+  description?: string;
+  category?: string;
+}
+
+export interface AssignRoleRequest {
+  roleName: string;
+}
+
+export interface UpdatePermissionRequest {
+  permissionName: string;
+  granted: boolean;
 }
 
 export interface LoginRequest {
@@ -26,19 +51,24 @@ export interface RegisterRequest {
   username: string;
   email: string;
   password: string;
-  confirmPassword: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
+  confirmPassword?: string;
   role?: UserRole;
 }
 
 export interface AuthResponse {
+  token: string;
+  accessToken?: string;
+  refreshToken?: string;
   user: User;
-  accessToken?: string; // New backend structure
-  refreshToken?: string; // New backend structure
-  tokenType?: string | null;
-  expiresIn?: number;
-  token?: string; // Keep for backward compatibility
   message?: string;
 }
 
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  USER = 'USER',
+  PURCHASING_MANAGER = 'PURCHASING_MANAGER',
+  WAREHOUSE_KEEPER = 'WAREHOUSE_KEEPER',
+  WORKSHOP_MANAGER = 'WORKSHOP_MANAGER'
+}

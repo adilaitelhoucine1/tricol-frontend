@@ -37,8 +37,11 @@ export class LoginComponent {
         console.log('Login successful:', response.message);
 
 
-        const userRole = response.user?.roles;
-        if (userRole?.includes("ADMIN")) {
+        const userRole = response.user?.roles || response.user?.role;
+        if (Array.isArray(userRole) && userRole.includes("ADMIN")) {
+          console.log("Navigating to admin dashboard, role:", userRole);
+          this.router.navigate(['/admin-dashboard']);
+        } else if (userRole && !Array.isArray(userRole) && 'name' in userRole && userRole.name === 'ADMIN') {
           console.log("Navigating to admin dashboard, role:", userRole);
           this.router.navigate(['/admin-dashboard']);
         } else {

@@ -36,13 +36,17 @@ export class DataTableComponent {
   }
 
   getCellValue(row: any, column: TableColumn): any {
-    const value = row[column.key];
+    const value = this.getNestedValue(row, column.key);
 
     if (column.format) {
       return column.format(value, row);
     }
 
     return value ?? '-';
+  }
+
+  private getNestedValue(obj: any, path: string): any {
+    return path.split('.').reduce((current, prop) => current?.[prop], obj);
   }
 
   executeAction(action: TableAction, row: any, event: Event): void {

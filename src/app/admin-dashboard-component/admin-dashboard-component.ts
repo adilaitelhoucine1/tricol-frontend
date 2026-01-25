@@ -12,6 +12,11 @@ import {Order} from '../models/order.model';
 import {OrderItem} from '../models/OrderItem.model';
 import {EtatGlobal, AlerteStock} from '../models/stock.model';
 import {StockService} from '../services/stock.service';
+import {User, Role} from '../models/user.model';
+import {UserService} from '../services/user.service';
+import {PermissionService} from '../services/permission.service';
+
+
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -26,11 +31,35 @@ export class AdminDashboardComponent implements OnInit {
    private productService=inject(ProductService);
    private orderService = inject(OrderService);
    private stockService = inject(StockService);
-   private cdr = inject(ChangeDetectorRef);
+   private userService = inject(UserService);
+   private permissionService = inject(PermissionService);
+
+  private cdr = inject(ChangeDetectorRef);
    private fb = inject(FormBuilder);
 
 
-   suppliers: SupplierModal[] = [];
+  canViewSuppliers = () => this.permissionService.hasPermission('CONSULTER_FOURNISSEUR');
+  canCreateSupplier = () => this.permissionService.hasPermission('CREER_FOURNISSEUR');
+  canModifySupplier = () => this.permissionService.hasPermission('MODIFIER_FOURNISSEUR');
+  canDeleteSupplier = () => this.permissionService.hasPermission('SUPPRIMER_FOURNISSEUR');
+
+  canViewProducts = () => this.permissionService.hasPermission('CONSULTER_PRODUIT');
+  canCreateProduct = () => this.permissionService.hasPermission('CREER_PRODUIT');
+  canModifyProduct = () => this.permissionService.hasPermission('MODIFIER_PRODUIT');
+  canDeleteProduct = () => this.permissionService.hasPermission('SUPPRIMER_PRODUIT');
+
+  canViewOrders = () => this.permissionService.hasPermission('CONSULTER_COMMANDE');
+  canCreateOrder = () => this.permissionService.hasPermission('CREER_COMMANDE');
+  canValidateOrder = () => this.permissionService.hasPermission('VALIDER_COMMANDE');
+  canCancelOrder = () => this.permissionService.hasPermission('ANNULER_COMMANDE');
+  canReceiveOrder = () => this.permissionService.hasPermission('RECEPTIONNER_COMMANDE');
+
+  canViewStock = () => this.permissionService.hasPermission('CONSULTER_STOCK');
+  canManageUsers = () => this.permissionService.hasPermission('GERER_UTILISATEURS');
+
+
+
+  suppliers: SupplierModal[] = [];
    products: Product[]=[];
    orders:Order[]=[];
    orderItems:OrderItem[]=[];
@@ -38,27 +67,35 @@ export class AdminDashboardComponent implements OnInit {
    stockByProduit: any = null;
    alertes: AlerteStock[] = [];
    valorisation: string = '';
+   users: User[] = [];
+   roles: Role[] = [];
+   currentUser?: User;
 
    loadingSuppliers: boolean = false;
    loadingProducts: boolean = false;
    loadingOrders: boolean = false;
    loadingStock: boolean = false;
+   loadingUsers: boolean = false;
 
    sidebarOpen: boolean = true;
   activeSection: string = 'suppliers';
 
   showModal: boolean = false;
-  modalType: 'supplier' | 'product' | 'order' = 'supplier';
+  modalType: 'supplier' | 'product' | 'order' | 'user' | 'permission' = 'supplier';
   isEditMode: boolean = false;
   isSubmitting: boolean = false;
   currentSupplierId?: number;
   currentProductId?: number;
   currentOrderId?: number;
+  currentUserId?: number;
 
   supplierForm!: FormGroup;
   productForm!: FormGroup;
   orderForm!: FormGroup;
   orderItemForm!: FormGroup;
+  userRoleForm!: FormGroup;
+  permissionForm!: FormGroup;
+  availablePermissions: any[] = [];
 
 
   supplierColumns: TableColumn[] = [
@@ -157,11 +194,53 @@ export class AdminDashboardComponent implements OnInit {
     { key: 'enAlerte', label: 'Alerte', type: 'text' }
   ];
 
+  userColumns: TableColumn[] = [
+    { key: 'id', label: 'ID', type: 'number' },
+    { key: 'username', label: 'Username', type: 'text' },
+    { key: 'email', label: 'Email', type: 'text' },
+    { key: 'role.name', label: 'Rôle', type: 'text' },
+    {
+      key: 'permissions',
+      label: 'Permissions',
+      type: 'text',
+      format: (value: any, row: User) => this.formatPermissions(row)
+    },
+    { key: 'enabled', label: 'Statut', type: 'text' }
+  ];
+
+  userActions: TableAction[] = [
+    {
+      label: 'Activer/Désactiver',
+      class: 'btn-toggle',
+      icon: '🔄',
+      onClick: (user) => this.toggleUserStatus(user)
+    },
+    {
+      label: 'Assigner Rôle',
+      class: 'btn-edit',
+      icon: '👤',
+      onClick: (user) => this.openAssignRoleModal(user)
+    },
+    {
+      label: 'Gérer Permissions',
+      class: 'btn-edit',
+      icon: '🔐',
+      onClick: (user) => this.openPermissionModal(user)
+    },
+    {
+      label: 'Supprimer',
+      class: 'btn-delete',
+      icon: '🗑️',
+      onClick: (user) => this.deleteUser(user.id)
+    }
+  ];
+
    ngOnInit(): void {
     this.initializeForm();
     this.getAllSuppliers();
     this.getAllProducts();
     this.getAllOrders();
+    this.getAllRoles();
   }
 
   initializeForm(): void {
@@ -201,6 +280,15 @@ export class AdminDashboardComponent implements OnInit {
       produitId: ['', [Validators.required]],
       quantite: [0, [Validators.required, Validators.min(1)]],
       prixUnitaire: [0, [Validators.required, Validators.min(0)]]
+    });
+
+    this.userRoleForm = this.fb.group({
+      roleName: ['', [Validators.required]]
+    });
+
+    this.permissionForm = this.fb.group({
+      permissionName: ['', [Validators.required]],
+      granted: [true, [Validators.required]]
     });
   }
 
@@ -265,11 +353,13 @@ export class AdminDashboardComponent implements OnInit {
     this.currentSupplierId = undefined;
     this.currentProductId = undefined;
     this.currentOrderId = undefined;
+    this.currentUserId = undefined;
     this.orderItems = [];
     this.supplierForm?.reset();
     this.productForm?.reset();
     this.orderForm?.reset();
     this.orderItemForm?.reset();
+    this.userRoleForm?.reset();
   }
 
   submitSupplier(): void {
@@ -451,7 +541,7 @@ export class AdminDashboardComponent implements OnInit {
         this.orders=data;
       },
       error(error){
-        console.log("error");
+        console.log(error);
       }
     })
   }
@@ -629,6 +719,170 @@ export class AdminDashboardComponent implements OnInit {
       },
       error: (err) => console.error('Erreur lors du chargement de la valorisation:', err)
     });
+  }
+
+  getAllUsers(): void {
+    this.loadingUsers = true;
+    this.userService.getAllUsers().subscribe({
+      next: (data) => {
+        this.users = data;
+        this.loadAvailablePermissions(data);
+        this.loadingUsers = false;
+        this.cdr.detectChanges();
+
+      },
+      error: (err) => {
+        this.loadingUsers = false;
+        console.error('Erreur lors du chargement des utilisateurs:', err);
+      }
+    });
+  }
+
+  loadAvailablePermissions(users: User[]): void {
+    const permissionsSet = new Set<any>();
+    users.forEach(user => {
+      if (user.role?.permissions) {
+        user.role.permissions.forEach(p => {
+          permissionsSet.add(JSON.stringify({ id: p.id, name: p.name, category: p.category }));
+          console.log("*******" , permissionsSet);
+        });
+      }
+    });
+    this.availablePermissions = Array.from(permissionsSet).map(p => JSON.parse(p));
+  }
+
+  formatPermissions(user: User): string {
+    const rolePerms = user.role?.permissions?.map(p => p.name) || [];
+    const customPerms = user.customPermissions || [];
+    const revokedPerms = customPerms.filter((cp: any) => !cp.granted).map((cp: any) => cp.permissionName);
+    const grantedPerms = customPerms.filter((cp: any) => cp.granted).map((cp: any) => cp.permissionName);
+
+    const effectivePerms = [...rolePerms.filter(p => !revokedPerms.includes(p)), ...grantedPerms];
+    return effectivePerms.length > 0 ? `${effectivePerms.length} permissions` : 'Aucune';
+  }
+
+  getAllRoles(): void {
+    this.userService.getAllRoles().subscribe({
+      next: (data) => {
+        this.roles = data;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Erreur lors du chargement des rôles:', err)
+    });
+  }
+
+  toggleUserStatus(user: User): void {
+    if (user.enabled) {
+      this.userService.disableUser(user.id).subscribe({
+        next: () => {
+          this.getAllUsers();
+          alert('Utilisateur désactivé avec succès');
+        },
+        error: (err) => alert('Erreur lors de la désactivation')
+      });
+    } else {
+      this.userService.enableUser(user.id).subscribe({
+        next: () => {
+          this.getAllUsers();
+          alert('Utilisateur activé avec succès');
+        },
+        error: (err) => alert('Erreur lors de l\'activation')
+      });
+    }
+  }
+
+  openAssignRoleModal(user: User): void {
+    this.modalType = 'user';
+    this.currentUserId = user.id;
+    this.userRoleForm.reset();
+    this.showModal = true;
+  }
+
+  assignRole(): void {
+    if (this.userRoleForm.invalid || !this.currentUserId) return;
+
+    this.isSubmitting = true;
+    this.userService.assignRoleToUser(this.currentUserId, this.userRoleForm.value).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.closeModal();
+        this.getAllUsers();
+        alert('Rôle assigné avec succès');
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        alert('Erreur lors de l\'assignation du rôle');
+      }
+    });
+  }
+
+  openPermissionModal(user: User): void {
+    this.modalType = 'permission';
+    this.currentUserId = user.id;
+    this.currentUser = user;
+    this.permissionForm.reset({ granted: true });
+    this.showModal = true;
+  }
+
+  updatePermission(): void {
+    if (this.permissionForm.invalid || !this.currentUserId) return;
+
+    this.isSubmitting = true;
+    this.userService.updateUserPermission(this.currentUserId, this.permissionForm.value).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.closeModal();
+        this.getAllUsers();
+        alert('Permission mise à jour avec succès');
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        alert('Erreur lors de la mise à jour de la permission');
+      }
+    });
+  }
+
+  deleteUser(id: number): void {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
+      this.userService.deleteUser(id).subscribe({
+        next: () => {
+          this.getAllUsers();
+          alert('Utilisateur supprimé avec succès');
+        },
+        error: (err) => alert('Erreur lors de la suppression')
+      });
+    }
+  }
+
+  getUserPermissions(): any[] {
+    if (!this.currentUser) return [];
+
+    const rolePerms = this.currentUser.role?.permissions || [];
+    const customPerms = this.currentUser.customPermissions || [];
+
+    const allPerms = rolePerms.map(p => {
+      const custom = customPerms.find((cp: any) => cp.permissionName === p.name);
+      return {
+        ...p,
+        fromRole: true,
+        granted: custom ? custom.granted : true,
+        hasCustom: !!custom
+      };
+    });
+
+    const customOnlyPerms = customPerms
+      .filter((cp: any) => cp.granted && !rolePerms.find(p => p.name === cp.permissionName))
+      .map((cp: any) => ({
+        id: cp.permissionId,
+        name: cp.permissionName,
+        category: cp.permissionCategory,
+        description: '',
+        fromRole: false,
+        granted: true,
+        hasCustom: true
+      }));
+
+    return [...allPerms, ...customOnlyPerms];
   }
 
 

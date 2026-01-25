@@ -110,7 +110,7 @@ export class AuthService {
 
   hasRole(role: UserRole): boolean {
     const user = this.currentUserSignal();
-    return user?.role === role;
+    return user?.role?.name === role || user?.roles?.includes(role) || false;
   }
 
   private setAuthData(user: User, token: string, refreshToken?: string): void {

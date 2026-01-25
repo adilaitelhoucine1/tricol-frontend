@@ -1,25 +1,31 @@
 import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { catchError, throwError } from 'rxjs';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  // Get the token from localStorage
   const token = localStorage.getItem('tricol_token');
 
-  // Skip token for auth endpoints (login/register)
   if (req.url.includes('/auth/login') || req.url.includes('/auth/register')) {
     return next(req);
   }
 
-  // If token exists, clone the request and add the Authorization header
   if (token) {
     const clonedRequest = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`
       }
     });
-    return next(clonedRequest);
+    return next(clonedRequest).pipe(
+      catchError((error) => {
+        if (error.status === 403) {
+          const message = error.error?.message || "You don't have permission to access this resource";
+          alert(message);
+        }
+        return throwError(() => error);
+      })
+    );
   }
 
-  // If no token, proceed with the original request
   return next(req);
 };
 

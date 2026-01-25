@@ -3,27 +3,36 @@
   <aside class="sidebar" [class.sidebar-closed]="!sidebarOpen">
     <div class="sidebar-header">
       <div class="logo">
-        <h2 *ngIf="sidebarOpen">TRICOL</h2>
+        <h2 *ngIf="sidebarOpen">Tricoll</h2>
       </div>
     </div>
 
     <nav class="sidebar-nav">
-      <a class="nav-item" [class.active]="activeSection === 'suppliers'" (click)="setActiveSection('suppliers')">
+      <a *ngIf="canViewSuppliers()" class="nav-item" [class.active]="activeSection === 'suppliers'" (click)="setActiveSection('suppliers')">
+        <span class="icon">📦</span>
         <span *ngIf="sidebarOpen">Fournisseurs</span>
       </a>
-      <a class="nav-item" [class.active]="activeSection === 'products'" (click)="setActiveSection('products')">
+      <a  *ngIf="canViewProducts()" class="nav-item" [class.active]="activeSection === 'products'" (click)="setActiveSection('products')">
+        <span class="icon">📋</span>
         <span *ngIf="sidebarOpen">Produits</span>
       </a>
-      <a class="nav-item" [class.active]="activeSection === 'orders'" (click)="setActiveSection('orders')">
+      <a *ngIf="canViewOrders()" class="nav-item" [class.active]="activeSection === 'orders'" (click)="setActiveSection('orders')">
+        <span class="icon">🛒</span>
         <span *ngIf="sidebarOpen">Commandes Fournisseurs</span>
       </a>
-      <a class="nav-item" [class.active]="activeSection === 'stock'" (click)="setActiveSection('stock')">
+      <a *ngIf="canViewStock()"  class="nav-item" [class.active]="activeSection === 'stock'" (click)="setActiveSection('stock')">
+        <span class="icon">📊</span>
         <span *ngIf="sidebarOpen">Gestion de Stock</span>
+      </a>
+      <a *ngIf="canManageUsers()" class="nav-item" [class.active]="activeSection === 'users'" (click)="setActiveSection('users'); getAllUsers()">
+        <span class="icon">👥</span>
+        <span *ngIf="sidebarOpen">Gestion des Utilisateurs</span>
       </a>
     </nav>
 
     <div class="sidebar-footer">
       <button class="nav-item logout-btn" (click)="logout()">
+        <span class="icon">🚪</span>
         <span *ngIf="sidebarOpen">Déconnexion</span>
       </button>
     </div>
@@ -41,7 +50,7 @@
       <div *ngIf="activeSection === 'suppliers'">
         <div class="content-header">
           <h2 class="section-title">Gestion des Fournisseurs</h2>
-          <button class="btn-add" (click)="addSupplier()">
+          <button *ngIf="canCreateSupplier()" class="btn-add" (click)="addSupplier()">
             <span class="icon">➕</span>
             <span>Ajouter un Fournisseur</span>
           </button>
@@ -61,7 +70,7 @@
       <div *ngIf="activeSection === 'products'">
         <div class="content-header">
           <h2 class="section-title">Gestion des Produits</h2>
-          <button class="btn-add" (click)="addProduct()">
+          <button *ngIf="canCreateProduct()" class="btn-add" (click)="addProduct()">
             <span class="icon">➕</span>
             <span>Ajouter un Produit</span>
           </button>
@@ -81,7 +90,7 @@
       <div *ngIf="activeSection === 'orders'">
         <div class="content-header">
           <h2 class="section-title">Gestion des Commandes Fournisseurs</h2>
-          <button class="btn-add" (click)="addOrder()">
+          <button *ngIf="canCreateOrder()" class="btn-add" (click)="addOrder()">
             <span class="icon">➕</span>
             <span>Ajouter une Commande</span>
           </button>
@@ -98,7 +107,7 @@
       </div>
 
       <!-- Stock Section -->
-      <div *ngIf="activeSection === 'stock'">
+      <div *ngIf="activeSection === 'stock' && canViewStock()">
         <div class="content-header">
           <h2 class="section-title">Gestion de Stock</h2>
           <button class="btn-add" (click)="getEtatGlobal()">
@@ -149,6 +158,21 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Users Section -->
+      <div *ngIf="activeSection === 'users'">
+        <div class="content-header">
+          <h2 class="section-title">Gestion des Utilisateurs</h2>
+        </div>
+
+        <app-data-table
+          [columns]="userColumns"
+          [data]="users"
+          [actions]="userActions"
+          [loading]="loadingUsers"
+          [emptyMessage]="'Aucun utilisateur trouvé'">
+        </app-data-table>
       </div>
     </div>
   </main>
@@ -389,6 +413,92 @@
             <button type="button" class="btn btn-secondary" (click)="closeModal()">Annuler</button>
             <button type="button" class="btn btn-primary" [disabled]="orderForm.invalid || isSubmitting" (click)="submitOrder()">
               {{ isSubmitting ? 'Enregistrement...' : 'Créer la Commande' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assign Role Modal -->
+  <div class="modal-overlay" *ngIf="showModal && modalType === 'user'" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Assigner un Rôle</h2>
+        <button class="btn-close" (click)="closeModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <form [formGroup]="userRoleForm">
+          <div class="form-group">
+            <label for="roleName">Rôle <span class="required">*</span></label>
+            <select id="roleName" class="form-control" formControlName="roleName">
+              <option value="">Sélectionnez un rôle</option>
+              <option *ngFor="let role of roles" [value]="role.name">{{ role.name }}</option>
+            </select>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">Annuler</button>
+            <button type="button" class="btn btn-primary" [disabled]="userRoleForm.invalid || isSubmitting" (click)="assignRole()">
+              {{ isSubmitting ? 'Assignation...' : 'Assigner' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manage Permission Modal -->
+  <div class="modal-overlay" *ngIf="showModal && modalType === 'permission'" (click)="closeModal()">
+    <div class="modal-content" style="max-width: 800px;" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Gérer les Permissions - {{ currentUser?.username }}</h2>
+        <button class="btn-close" (click)="closeModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div *ngIf="getUserPermissions().length > 0" style="margin-bottom: 2rem;">
+          <h3 style="margin-bottom: 1rem; color: #1e3c72;">Permissions du rôle: {{ currentUser?.role?.name }}</h3>
+          <div style="max-height: 300px; overflow-y: auto; border: 1px solid #e8ecf1; border-radius: 8px; padding: 1rem;">
+            <div *ngFor="let perm of getUserPermissions()" style="padding: 0.75rem; margin-bottom: 0.5rem; background: #f8fafb; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong>{{ perm.name }}</strong>
+                <span style="color: #607D8B; font-size: 0.85rem; margin-left: 0.5rem;">({{ perm.category }})</span>
+                <span *ngIf="!perm.fromRole" style="background: #2196F3; color: white; padding: 0.15rem 0.5rem; border-radius: 3px; font-size: 0.75rem; margin-left: 0.5rem;">Custom</span>
+                <p style="margin: 0.25rem 0 0 0; font-size: 0.85rem; color: #6c757d;">{{ perm.description || 'Permission personnalisée' }}</p>
+              </div>
+              <span *ngIf="!perm.granted" style="background: #f44336; color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem;">Révoquée</span>
+              <span *ngIf="perm.granted && perm.hasCustom && perm.fromRole" style="background: #4CAF50; color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem;">Accordée</span>
+              <span *ngIf="perm.granted && !perm.hasCustom" style="background: #607D8B; color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem;">Du rôle</span>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="margin-bottom: 1rem; color: #1e3c72;">Modifier une permission</h3>
+        <form [formGroup]="permissionForm">
+          <div class="form-group">
+            <label for="permissionName">Permission <span class="required">*</span></label>
+            <select id="permissionName" class="form-control" formControlName="permissionName">
+              <option value="">Sélectionnez une permission</option>
+              <option *ngFor="let permission of availablePermissions" [value]="permission.name">
+                {{ permission.name }} ({{ permission.category }})
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="granted">Action <span class="required">*</span></label>
+            <select id="granted" class="form-control" formControlName="granted">
+              <option [value]="true">Accorder</option>
+              <option [value]="false">Révoquer</option>
+            </select>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">Annuler</button>
+            <button type="button" class="btn btn-primary" [disabled]="permissionForm.invalid || isSubmitting" (click)="updatePermission()">
+              {{ isSubmitting ? 'Mise à jour...' : 'Mettre à jour' }}
             </button>
           </div>
         </form>
