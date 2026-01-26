@@ -10,8 +10,14 @@
   <!-- Main Content -->
   <main class="main-content">
     <header class="header">
-      <button class="toggle-btn" (click)="toggleSidebar()">☰</button>
-      <h1 class="page-title">Administration - TRICOL</h1>
+      <button class="toggle-btn" (click)="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="3" y1="12" x2="21" y2="12" stroke-width="2" stroke-linecap="round"/>
+          <line x1="3" y1="6" x2="21" y2="6" stroke-width="2" stroke-linecap="round"/>
+          <line x1="3" y1="18" x2="21" y2="18" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <h1 class="page-title">{{ getPageTitle() }}</h1>
     </header>
 
     <div class="content">

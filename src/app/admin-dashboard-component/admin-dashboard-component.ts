@@ -29,6 +29,17 @@ export class AdminDashboardComponent {
     this.activeSection = section;
   }
 
+  getPageTitle(): string {
+    const titles: { [key: string]: string } = {
+      'suppliers': 'Fournisseurs',
+      'products': 'Produits',
+      'orders': 'Commandes Fournisseurs',
+      'stock': 'Gestion de Stock',
+      'users': 'Gestion des Utilisateurs'
+    };
+    return titles[this.activeSection] || 'Dashboard';
+  }
+
   logout(): void {
     this.authService.logout();
   }

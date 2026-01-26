@@ -1,8 +1,8 @@
-/* Admin Dashboard Layout Styles */
+/* Clean Modern Dashboard Layout */
 .admin-dashboard {
   display: flex;
   height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  background: #F7F8FA;
   overflow: hidden;
 }
 
@@ -14,74 +14,92 @@
   overflow: hidden;
 }
 
-/* Header */
+/* Clean Header */
 .header {
-  background: white;
-  padding: 1.5rem 2.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: #FFFFFF;
+  padding: 1.25rem 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   gap: 1.5rem;
   z-index: 50;
   flex-shrink: 0;
-  border-bottom: 3px solid #1e3c72;
+  border-bottom: 1px solid #E8EAED;
 }
 
 .toggle-btn {
-  background: #f0f4f8;
+  background: #F7F8FA;
   border: none;
   cursor: pointer;
-  padding: 0.75rem;
-  border-radius: 10px;
+  padding: 0.625rem;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
-  font-size: 1.5rem;
+  transition: all 0.2s ease;
+  color: #6C7293;
+  width: 40px;
+  height: 40px;
+}
+
+.toggle-btn svg {
+  width: 20px;
+  height: 20px;
 }
 
 .toggle-btn:hover {
-  background: #1e3c72;
+  background: #5B6BE8;
   color: white;
-  transform: scale(1.05);
+}
+
+.toggle-btn:hover svg {
+  stroke: white;
 }
 
 .page-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #1e3c72;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1F2937;
   margin: 0;
-  letter-spacing: 0.5px;
+  letter-spacing: -0.02em;
 }
 
 /* Content Area */
 .content {
   flex: 1;
-  padding: 2.5rem;
+  padding: 2rem;
   overflow-y: auto;
 }
 
 /* Scrollbar Styling */
 .content::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .content::-webkit-scrollbar-track {
-  background: #f1f3f5;
+  background: transparent;
 }
 
 .content::-webkit-scrollbar-thumb {
-  background: #adb5bd;
-  border-radius: 3px;
+  background: #D1D5DB;
+  border-radius: 4px;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .content {
-    padding: 1rem;
+    padding: 1.25rem;
   }
 
   .page-title {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
+  }
+
+  .header {
+    padding: 1rem 1.25rem;
   }
 }
