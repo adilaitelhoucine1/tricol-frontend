@@ -1,0 +1,82 @@
+<div>
+  <div class="content-header">
+    <h2 class="section-title">Gestion des Commandes Fournisseurs</h2>
+    <button *ngIf="canCreateOrder()" class="btn-add" (click)="addOrder()">
+      <span class="icon">➕</span>
+      <span>Ajouter une Commande</span>
+    </button>
+  </div>
+
+  <app-data-table
+    [columns]="orderColumns"
+    [data]="orders"
+    [actions]="orderActions"
+    [loading]="loadingOrders"
+    [emptyMessage]="'Aucune commande trouvée'"
+    (rowClick)="onOrderRowClick($event)">
+  </app-data-table>
+</div>
+
+<!-- Add/Edit Order Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-content" style="max-width: 700px;" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ isEditMode ? 'Modifier la Commande' : 'Ajouter une Commande' }}</h2>
+      <button class="btn-close" (click)="closeModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <form [formGroup]="orderForm">
+        <div class="form-group">
+          <label for="numeroCommande">N° Commande <span class="required">*</span></label>
+          <input type="text" id="numeroCommande" class="form-control" formControlName="numeroCommande" placeholder="Ex: CMD-2024-001" />
+        </div>
+
+        <div class="form-group">
+          <label for="fournisseurId">Fournisseur <span class="required">*</span></label>
+          <select id="fournisseurId" class="form-control" formControlName="fournisseurId">
+            <option value="">Sélectionnez un fournisseur</option>
+            <option *ngFor="let supplier of suppliers" [value]="supplier.id">{{ supplier.raisonSociale }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="dateCommande">Date Commande <span class="required">*</span></label>
+          <input type="date" id="dateCommande" class="form-control" formControlName="dateCommande" />
+        </div>
+
+        <div class="form-group">
+          <label for="produitId">Produit <span class="required">*</span></label>
+          <select id="produitId" class="form-control" formControlName="produitId">
+            <option value="">Sélectionnez un produit</option>
+            <option *ngFor="let product of products" [value]="product.id">{{ product.nom }}</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="quantite">Quantité <span class="required">*</span></label>
+            <input type="number" id="quantite" class="form-control" formControlName="quantite" min="1" />
+          </div>
+
+          <div class="form-group">
+            <label for="prixUnitaire">Prix Unitaire <span class="required">*</span></label>
+            <input type="number" id="prixUnitaire" class="form-control" formControlName="prixUnitaire" step="0.01" min="0" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="observations">Observations</label>
+          <textarea id="observations" class="form-control" formControlName="observations" rows="3" placeholder="Observations..."></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Annuler</button>
+          <button type="button" class="btn btn-primary" [disabled]="orderForm.invalid || isSubmitting" (click)="submitOrder()">
+            {{ isSubmitting ? 'Enregistrement...' : 'Créer la Commande' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,103 @@
+<div>
+  <div class="content-header">
+    <h2 class="section-title">Gestion des Fournisseurs</h2>
+    <button *ngIf="canCreateSupplier()" class="btn-add" (click)="addSupplier()">
+      <span class="icon">➕</span>
+      <span>Ajouter un Fournisseur</span>
+    </button>
+  </div>
+
+  <app-data-table
+    [columns]="supplierColumns"
+    [data]="suppliers"
+    [actions]="supplierActions"
+    [loading]="loadingSuppliers"
+    [emptyMessage]="'Aucun fournisseur trouvé'"
+    (rowClick)="onSupplierRowClick($event)">
+  </app-data-table>
+</div>
+
+<!-- Add/Edit Supplier Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ isEditMode ? 'Modifier le Fournisseur' : 'Ajouter un Fournisseur' }}</h2>
+      <button class="btn-close" (click)="closeModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <form [formGroup]="supplierForm">
+        <div class="form-group">
+          <label for="raisonSociale">Raison Sociale <span class="required">*</span></label>
+          <input type="text" id="raisonSociale" class="form-control" formControlName="raisonSociale" placeholder="Ex: SARL ABC" [class.error]="supplierForm.get('raisonSociale')?.invalid && supplierForm.get('raisonSociale')?.touched" />
+          <div class="error-message" *ngIf="supplierForm.get('raisonSociale')?.invalid && supplierForm.get('raisonSociale')?.touched">
+            <span *ngIf="supplierForm.get('raisonSociale')?.errors?.['required']">La raison sociale est obligatoire</span>
+            <span *ngIf="supplierForm.get('raisonSociale')?.errors?.['maxlength']">La raison sociale ne doit pas dépasser 200 caractères</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="adresse">Adresse <span class="required">*</span></label>
+          <textarea id="adresse" class="form-control" formControlName="adresse" placeholder="Ex: 123 Rue de la République" rows="3" [class.error]="supplierForm.get('adresse')?.invalid && supplierForm.get('adresse')?.touched"></textarea>
+          <div class="error-message" *ngIf="supplierForm.get('adresse')?.invalid && supplierForm.get('adresse')?.touched">
+            <span *ngIf="supplierForm.get('adresse')?.errors?.['required']">L'adresse est obligatoire</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="ville">Ville <span class="required">*</span></label>
+          <input type="text" id="ville" class="form-control" formControlName="ville" placeholder="Ex: Casablanca" [class.error]="supplierForm.get('ville')?.invalid && supplierForm.get('ville')?.touched" />
+          <div class="error-message" *ngIf="supplierForm.get('ville')?.invalid && supplierForm.get('ville')?.touched">
+            <span *ngIf="supplierForm.get('ville')?.errors?.['required']">La ville est obligatoire</span>
+            <span *ngIf="supplierForm.get('ville')?.errors?.['maxlength']">La ville ne doit pas dépasser 100 caractères</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="personneContact">Personne de Contact <span class="required">*</span></label>
+          <input type="text" id="personneContact" class="form-control" formControlName="personneContact" placeholder="Ex: Ahmed Benali" [class.error]="supplierForm.get('personneContact')?.invalid && supplierForm.get('personneContact')?.touched" />
+          <div class="error-message" *ngIf="supplierForm.get('personneContact')?.invalid && supplierForm.get('personneContact')?.touched">
+            <span *ngIf="supplierForm.get('personneContact')?.errors?.['required']">Le nom de la personne de contact est obligatoire</span>
+            <span *ngIf="supplierForm.get('personneContact')?.errors?.['maxlength']">Le nom ne doit pas dépasser 150 caractères</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email">Email <span class="required">*</span></label>
+            <input type="email" id="email" class="form-control" formControlName="email" placeholder="Ex: contact@exemple.com" [class.error]="supplierForm.get('email')?.invalid && supplierForm.get('email')?.touched" />
+            <div class="error-message" *ngIf="supplierForm.get('email')?.invalid && supplierForm.get('email')?.touched">
+              <span *ngIf="supplierForm.get('email')?.errors?.['required']">L'email est obligatoire</span>
+              <span *ngIf="supplierForm.get('email')?.errors?.['email']">Format d'email invalide</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="telephone">Téléphone <span class="required">*</span></label>
+            <input type="tel" id="telephone" class="form-control" formControlName="telephone" placeholder="Ex: +212600000000" [class.error]="supplierForm.get('telephone')?.invalid && supplierForm.get('telephone')?.touched" />
+            <div class="error-message" *ngIf="supplierForm.get('telephone')?.invalid && supplierForm.get('telephone')?.touched">
+              <span *ngIf="supplierForm.get('telephone')?.errors?.['required']">Le téléphone est obligatoire</span>
+              <span *ngIf="supplierForm.get('telephone')?.errors?.['pattern']">Format de téléphone invalide (10-15 chiffres)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="ice">ICE (Identifiant Commun de l'Entreprise) <span class="required">*</span></label>
+          <input type="text" id="ice" class="form-control" formControlName="ice" placeholder="Ex: 001234567890123 (15 caractères)" maxlength="15" [class.error]="supplierForm.get('ice')?.invalid && supplierForm.get('ice')?.touched" />
+          <div class="error-message" *ngIf="supplierForm.get('ice')?.invalid && supplierForm.get('ice')?.touched">
+            <span *ngIf="supplierForm.get('ice')?.errors?.['required']">L'ICE est obligatoire</span>
+            <span *ngIf="supplierForm.get('ice')?.errors?.['minlength'] || supplierForm.get('ice')?.errors?.['maxlength']">L'ICE doit contenir exactement 15 caractères</span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Annuler</button>
+          <button type="button" class="btn btn-primary" [disabled]="supplierForm.invalid || isSubmitting" (click)="submitSupplier()">
+            {{ isSubmitting ? 'Enregistrement...' : (isEditMode ? 'Modifier' : 'Ajouter') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

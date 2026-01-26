@@ -1,0 +1,99 @@
+<div>
+  <div class="content-header">
+    <h2 class="section-title">Gestion des Utilisateurs</h2>
+  </div>
+
+  <app-data-table
+    [columns]="userColumns"
+    [data]="users"
+    [actions]="userActions"
+    [loading]="loadingUsers"
+    [emptyMessage]="'Aucun utilisateur trouvé'">
+  </app-data-table>
+</div>
+
+<!-- Assign Role Modal -->
+<div class="modal-overlay" *ngIf="showModal && modalType === 'user'" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Assigner un Rôle</h2>
+      <button class="btn-close" (click)="closeModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <form [formGroup]="userRoleForm">
+        <div class="form-group">
+          <label for="roleName">Rôle <span class="required">*</span></label>
+          <select id="roleName" class="form-control" formControlName="roleName">
+            <option value="">Sélectionnez un rôle</option>
+            <option *ngFor="let role of roles" [value]="role.name">{{ role.name }}</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Annuler</button>
+          <button type="button" class="btn btn-primary" [disabled]="userRoleForm.invalid || isSubmitting" (click)="assignRole()">
+            {{ isSubmitting ? 'Assignation...' : 'Assigner' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Manage Permission Modal -->
+<div class="modal-overlay" *ngIf="showModal && modalType === 'permission'" (click)="closeModal()">
+  <div class="modal-content" style="max-width: 800px;" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Gérer les Permissions - {{ currentUser?.username }}</h2>
+      <button class="btn-close" (click)="closeModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="getUserPermissions().length > 0" style="margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: #1e3c72;">Permissions du rôle: {{ currentUser?.role?.name }}</h3>
+        <div style="max-height: 300px; overflow-y: auto; border: 1px solid #e8ecf1; border-radius: 8px; padding: 1rem;">
+          <div *ngFor="let perm of getUserPermissions()" style="padding: 0.75rem; margin-bottom: 0.5rem; background: #f8fafb; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong>{{ perm.name }}</strong>
+              <span style="color: #607D8B; font-size: 0.85rem; margin-left: 0.5rem;">({{ perm.category }})</span>
+              <span *ngIf="!perm.fromRole" style="background: #2196F3; color: white; padding: 0.15rem 0.5rem; border-radius: 3px; font-size: 0.75rem; margin-left: 0.5rem;">Custom</span>
+              <p style="margin: 0.25rem 0 0 0; font-size: 0.85rem; color: #6c757d;">{{ perm.description || 'Permission personnalisée' }}</p>
+            </div>
+            <span *ngIf="!perm.granted" style="background: #f44336; color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem;">Révoquée</span>
+            <span *ngIf="perm.granted && perm.hasCustom && perm.fromRole" style="background: #4CAF50; color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem;">Accordée</span>
+            <span *ngIf="perm.granted && !perm.hasCustom" style="background: #607D8B; color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem;">Du rôle</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="margin-bottom: 1rem; color: #1e3c72;">Modifier une permission</h3>
+      <form [formGroup]="permissionForm">
+        <div class="form-group">
+          <label for="permissionName">Permission <span class="required">*</span></label>
+          <select id="permissionName" class="form-control" formControlName="permissionName">
+            <option value="">Sélectionnez une permission</option>
+            <option *ngFor="let permission of availablePermissions" [value]="permission.name">
+              {{ permission.name }} ({{ permission.category }})
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="granted">Action <span class="required">*</span></label>
+          <select id="granted" class="form-control" formControlName="granted">
+            <option [value]="true">Accorder</option>
+            <option [value]="false">Révoquer</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Annuler</button>
+          <button type="button" class="btn btn-primary" [disabled]="permissionForm.invalid || isSubmitting" (click)="updatePermission()">
+            {{ isSubmitting ? 'Mise à jour...' : 'Mettre à jour' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

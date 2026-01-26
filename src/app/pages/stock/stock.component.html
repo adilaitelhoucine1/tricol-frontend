@@ -1,0 +1,52 @@
+<div>
+  <div class="content-header">
+    <h2 class="section-title">Gestion de Stock</h2>
+    <button class="btn-add" (click)="getEtatGlobal()">
+      <span class="icon">🔄</span>
+      <span>Actualiser</span>
+    </button>
+  </div>
+
+  <app-data-table
+    [columns]="stockColumns"
+    [data]="etatGlobal"
+    [loading]="loadingStock"
+    [emptyMessage]="'Aucun stock trouvé'">
+  </app-data-table>
+
+  <div class="stock-additional-info">
+    <div class="stock-card">
+      <h3>Stock par Produit</h3>
+      <select class="form-control" (change)="getStockByProduit(+$any($event.target).value)">
+        <option value="">Sélectionner un produit</option>
+        <option *ngFor="let product of products" [value]="product.id">{{ product.nom }}</option>
+      </select>
+      <div *ngIf="stockByProduit" class="card-content">
+        <p><strong>Reference:</strong> {{ stockByProduit.reference }}</p>
+        <p><strong>Quantite Totale:</strong> {{ stockByProduit.quantiteTotale }}</p>
+        <p><strong>Valorisation Totale:</strong> {{ stockByProduit.valorisationTotale }}</p>
+      </div>
+    </div>
+
+    <div class="stock-card">
+      <h3>Alertes Stock</h3>
+      <button class="btn-refresh" (click)="getAlertes()">🔄 Actualiser</button>
+      <div *ngIf="alertes.length > 0" class="card-content">
+        <div *ngFor="let alerte of alertes" class="alert-item">
+          <p><strong>{{ alerte.nom }}</strong> ({{ alerte.reference }})</p>
+          <p>Stock: {{ alerte.stockActuel }} / Point de commande: {{ alerte.pointDeCommande }}</p>
+          <p class="text-danger">Manquant: {{ alerte.manquant }} unités</p>
+        </div>
+      </div>
+      <p *ngIf="alertes.length === 0" class="no-alert">Aucune alerte</p>
+    </div>
+
+    <div class="stock-card">
+      <h3>Valorisation</h3>
+      <button class="btn-refresh" (click)="getValorisation()">🔄 Actualiser</button>
+      <div *ngIf="valorisation" class="card-content">
+        <p class="valorisation-message">{{ valorisation }}</p>
+      </div>
+    </div>
+  </div>
+</div>

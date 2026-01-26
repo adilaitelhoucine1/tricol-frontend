@@ -2,3 +2,336 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Common Styles for Admin Dashboard */
+
+/* Content Header */
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.content-header .section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e3c72;
+  margin: 0;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.content-header .section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+  border-radius: 2px;
+}
+
+/* Buttons */
+.btn {
+  padding: 0.875rem 1.75rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.btn-add {
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1rem;
+  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.btn-add:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.btn-add .icon {
+  font-size: 1.2rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(30, 60, 114, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(30, 60, 114, 0.4);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #607D8B 0%, #78909C 100%);
+  color: white;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(96, 125, 139, 0.3);
+}
+
+.btn-edit {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.btn-edit:hover {
+  background-color: #1976d2;
+  color: white;
+}
+
+.btn-delete {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.btn-delete:hover {
+  background-color: #c62828;
+  color: white;
+}
+
+.btn-toggle {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.btn-toggle:hover {
+  background: #2196F3;
+  color: white;
+}
+
+.btn-validate {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.btn-validate:hover {
+  background: #4CAF50;
+  color: white;
+}
+
+.btn-cancel {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.btn-cancel:hover {
+  background: #FF9800;
+  color: white;
+}
+
+.btn-receive {
+  background: #f3e5f5;
+  color: #6a1b9a;
+}
+
+.btn-receive:hover {
+  background: #9C27B0;
+  color: white;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(30, 60, 114, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 650px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
+  padding: 2rem 2.5rem;
+  border-bottom: 2px solid #f0f4f8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #f8fafb 0%, #ffffff 100%);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e3c72;
+}
+
+.btn-close {
+  background: #f0f4f8;
+  border: none;
+  font-size: 1.75rem;
+  line-height: 1;
+  color: #607D8B;
+  cursor: pointer;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.btn-close:hover {
+  background: #f44336;
+  color: white;
+  transform: rotate(90deg);
+}
+
+.modal-body {
+  padding: 2.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 1.75rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: #37474f;
+  font-size: 0.95rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 2px solid #e8ecf1;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  background: #f8fafb;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #1e3c72;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(30, 60, 114, 0.1);
+}
+
+.form-control.error {
+  border-color: #f44336;
+  background: #ffebee;
+}
+
+.required {
+  color: #f44336;
+  font-weight: 700;
+}
+
+.error-message {
+  color: #f44336;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  display: block;
+  font-weight: 500;
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding-top: 2rem;
+  border-top: 2px solid #f0f4f8;
+}
+
+/* Text Utilities */
+.text-danger {
+  color: #dc3545 !important;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-height: 95vh;
+  }
+}

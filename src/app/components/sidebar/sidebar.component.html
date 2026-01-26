@@ -1,0 +1,37 @@
+<aside class="sidebar" [class.sidebar-closed]="!sidebarOpen">
+  <div class="sidebar-header">
+    <div class="logo">
+      <h2 *ngIf="sidebarOpen">Tricoll</h2>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a *ngIf="canViewSuppliers()" class="nav-item" [class.active]="activeSection === 'suppliers'" (click)="setActiveSection('suppliers')">
+      <span class="icon">📦</span>
+      <span *ngIf="sidebarOpen">Fournisseurs</span>
+    </a>
+    <a  *ngIf="canViewProducts()" class="nav-item" [class.active]="activeSection === 'products'" (click)="setActiveSection('products')">
+      <span class="icon">📋</span>
+      <span *ngIf="sidebarOpen">Produits</span>
+    </a>
+    <a *ngIf="canViewOrders()" class="nav-item" [class.active]="activeSection === 'orders'" (click)="setActiveSection('orders')">
+      <span class="icon">🛒</span>
+      <span *ngIf="sidebarOpen">Commandes Fournisseurs</span>
+    </a>
+    <a *ngIf="canViewStock()"  class="nav-item" [class.active]="activeSection === 'stock'" (click)="setActiveSection('stock')">
+      <span class="icon">📊</span>
+      <span *ngIf="sidebarOpen">Gestion de Stock</span>
+    </a>
+    <a *ngIf="canManageUsers()" class="nav-item" [class.active]="activeSection === 'users'" (click)="setActiveSection('users')">
+      <span class="icon">👥</span>
+      <span *ngIf="sidebarOpen">Gestion des Utilisateurs</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="nav-item logout-btn" (click)="logout()">
+      <span class="icon">🚪</span>
+      <span *ngIf="sidebarOpen">Déconnexion</span>
+    </button>
+  </div>
+</aside>

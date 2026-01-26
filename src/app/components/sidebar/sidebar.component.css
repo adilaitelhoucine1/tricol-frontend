@@ -1,0 +1,122 @@
+/* Sidebar Component Styles */
+.sidebar {
+  width: 280px;
+  min-width: 280px;
+  background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 100;
+  flex-shrink: 0;
+  height: 100vh;
+}
+
+.sidebar-closed {
+  width: 80px;
+  min-width: 80px;
+}
+
+.sidebar-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-weight: 700;
+  font-size: 1.75rem;
+  letter-spacing: 1px;
+  padding: 2rem 1.5rem;
+  min-height: 80px;
+}
+
+.logo h2 {
+  margin: 0;
+  color: white;
+}
+
+.logo img {
+  max-width: 180px;
+  height: auto;
+  object-fit: contain;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1.5rem 0;
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: none;
+  border: none;
+  border-left: 4px solid transparent;
+  width: 100%;
+  text-align: left;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0.25rem 0;
+}
+
+.nav-item .icon {
+  font-size: 1.5rem;
+  min-width: 24px;
+  text-align: center;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  padding-left: 2rem;
+}
+
+.nav-item.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-left-color: #4CAF50;
+  font-weight: 600;
+}
+
+.sidebar-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 1rem 0;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.logout-btn {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.logout-btn:hover {
+  background: rgba(244, 67, 54, 0.2);
+  color: #ff6b6b;
+  border-left-color: #ff6b6b;
+}
+
+/* Scrollbar Styling */
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
